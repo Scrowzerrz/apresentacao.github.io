@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Romantismo Brasileiro - Slideshow Profissional</title>
+    <style>
+        /* Importação da Fonte - Garantir que 'display=swap' está presente para melhor performance percebida */
+        @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Lato:ital,wght@0,300;0,400;0,700;1,400&family=Garamond:ital,wght@0,400;0,700;1,400;1,700&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+        :root {
+            --cor-fundo-base: #3d342f; /* Marrom fechado e sóbrio */
+            --cor-slide-bg: rgba(40, 30, 25, 0.9); /* Fundo de slide semi-transparente mais escuro/opaco */
+            --cor-texto-principal: #e8d8c3; /* Bege claro acinzentado */
+            --cor-texto-secundario: #beae9b; /* Bege mais escuro */
+            --cor-titulo-principal: #e8b471; /* Dourado/Ocre suave */
+            --cor-titulo-secundario: #c8a064;
+            --cor-glow: rgba(255, 190, 100, 0.5); /* Glow ainda mais sutil */
+            --cor-borda-destaque: #8a6d4d;
+            --cor-accent: #b3734d; /* Cor de destaque para elementos interativos */
+
+            /* Declaração das fontes */
+            --fonte-display: 'Great Vibes', cursive;
+            --fonte-titulo-secao: 'Playfair Display', 'Garamond', serif;
+            --fonte-corpo: 'Lato', sans-serif;
+
+            --transition-speed-slide: 1.1s; /* Transição de slide mais longa e suave */
+            --transition-easing-slide: cubic-bezier(0.65, 0, 0.35, 1); /* Curva suave */
+            --animation-duration-element: 1s; /* Duração padrão das animações de elementos */
+            --animation-easing-element: cubic-bezier(0.25, 0.46, 0.45, 0.94); /* EaseOutQuad - suave */
+            --animation-delay-step: 0.18s; /* Atraso entre elementos ligeiramente maior */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden; /* Essencial para full-page */
+            font-family: var(--fonte-corpo); /* Fonte padrão do corpo */
+            background-color: var(--cor-fundo-base);
+            color: var(--cor-texto-principal);
+        }
+
+        .slideshow-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            perspective: 1500px;
+            transform-style: preserve-3d;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 6vh 8vw;
+            background-color: var(--cor-slide-bg); /* Cor base enquanto carrega/sai */
+            opacity: 0;
+            visibility: hidden;
+            /* Default starting position (entering from right) */
+            transform: translateX(100%) rotateY(-8deg);
+            transform-origin: right center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background-size: cover;
+            background-position: center center;
+            will-change: transform, opacity, visibility; /* Hint for browser */
+            /* Define transition properties here for entering/exiting states */
+            transition: opacity var(--transition-speed-slide) var(--transition-easing-slide),
+                        transform var(--transition-speed-slide) var(--transition-easing-slide),
+                        /* Visibility changes instantly on active, delayed on inactive */
+                        visibility 0s linear var(--transition-speed-slide); /* Default: hide after delay */
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0) rotateY(0deg) scale(1); /* Ensure scale is 1 */
+            z-index: 1;
+            /* background-color: transparent; Removed: Let specific backgrounds handle this or default */
+            /* Transition for becoming active */
+            transition: opacity var(--transition-speed-slide) var(--transition-easing-slide),
+                        transform var(--transition-speed-slide) var(--transition-easing-slide),
+                        visibility 0s linear 0s; /* Make visible immediately */
+        }
+
+        /* This class defines the state *during* the exit transition */
+        .slide.exiting {
+             opacity: 0;
+             z-index: 0;
+             /* Transform will be set by JS based on direction */
+             /* Visibility transition from .slide base will handle hiding after delay */
+             transition: opacity var(--transition-speed-slide) var(--transition-easing-slide),
+                         transform var(--transition-speed-slide) var(--transition-easing-slide),
+                         visibility 0s linear var(--transition-speed-slide); /* Explicitly hide after delay */
+        }
+
+
+        /* --- Backgrounds Específicos com Imagens --- */
+        .slide[data-slide-id="1"] {
+            background-image: url("https://i.imgur.com/xfo5IwH.png"); /* Nova imagem de abertura */
+            background-blend-mode: normal; /* Resetar blend mode */
+            background-color: transparent; /* Resetar background color */
+        }
+
+        .slide[data-slide-id="5"] {
+            background-image: url("https://i.imgur.com/YDscWyC.png");
+             background-blend-mode: overlay;
+             background-color: rgba(61, 52, 47, 0.6); /* Overlay suave */
+        }
+
+        .slide[data-slide-id="8"] {
+            background-image: url("https://i.imgur.com/mHkUQBC.png");
+            background-blend-mode: luminosity;
+            background-color: rgba(30, 25, 20, 0.65); /* Overlay mais escuro */
+        }
+
+        .slide[data-slide-id="11"] {
+            background-image: url("https://i.imgur.com/gxCFXdO.png");
+             background-blend-mode: soft-light;
+             background-color: rgba(40, 30, 25, 0.5); /* Overlay intermediário */
+        }
+
+        .slide[data-slide-id="14"] {
+             background-image: url("https://i.imgur.com/Z0IOEgr.png");
+             background-blend-mode: color-burn;
+             background-color: rgba(61, 52, 47, 0.3); /* Overlay mais claro */
+        }
+
+        .slide[data-slide-id="15"] {
+            background-image: url("https://i.imgur.com/5rx8P3z.png"); /* Nova imagem de finalização */
+            background-blend-mode: normal; /* Resetar blend mode */
+            background-color: transparent; /* Resetar background color */
+        }
+
+        /* --- Slides com Fundo Sólido - Aplicando Gradiente Sutil --- */
+        /* (Slides 2, 3, 4, 7, 10, 13) */
+
+        /* Slide 2 - O Movimento Romântico */
+        .slide[data-slide-id="2"] {
+            background:
+                radial-gradient(circle at 20% 70%, rgba(138, 109, 77, 0.2) 0%, transparent 40%),
+                radial-gradient(circle at 80% 40%, rgba(200, 160, 100, 0.15) 0%, transparent 50%),
+                url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%238a6d4d' fill-opacity='0.07'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"),
+                #4a3f3a;
+        }
+
+        /* Slide 3 - Um Brasil em Busca de Si */
+        .slide[data-slide-id="3"] {
+            background:
+                radial-gradient(circle at 70% 20%, rgba(184, 143, 91, 0.2) 0%, transparent 45%),
+                radial-gradient(circle at 30% 80%, rgba(155, 123, 85, 0.15) 0%, transparent 50%),
+                url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23b3734d' fill-opacity='0.08' fill-rule='evenodd'/%3E%3C/svg%3E"),
+                #5a4a42;
+        }
+
+        /* Slide 4 - As Fases do Romantismo Brasileiro */
+        .slide[data-slide-id="4"] {
+            background:
+                radial-gradient(circle at 10% 30%, rgba(200, 160, 100, 0.18) 0%, transparent 60%),
+                radial-gradient(circle at 90% 60%, rgba(184, 140, 100, 0.15) 0%, transparent 55%),
+                url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23e8b471' fill-opacity='0.07' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E"),
+                var(--cor-fundo-base);
+        }
+
+        /* Slide 6: Características 1ª Geração - Tem um IMG no HTML, não precisa de background */
+        .slide[data-slide-id="6"] {
+            /* Estilos existentes ou adicionais se necessários, mas sem background-image */
+            background-color: var(--cor-fundo-base); /* Manter um fundo base */
+        }
+
+        /* Slide 7 - Vozes da Primeira Geração */
+        .slide[data-slide-id="7"] {
+            background:
+                linear-gradient(135deg, rgba(184, 143, 91, 0.1) 0%, transparent 70%),
+                url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c8a064' fill-opacity='0.07'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E"),
+                var(--cor-fundo-base);
+        }
+
+        /* Slide 9: Características 2ª Geração - Tem um IMG no HTML, não precisa de background */
+        .slide[data-slide-id="9"] {
+             /* Estilos existentes ou adicionais se necessários, mas sem background-image */
+             background-color: var(--cor-fundo-base); /* Manter um fundo base */
+        }
+
+        /* Slide 10 - Poetas da Noite */
+        .slide[data-slide-id="10"] {
+            background:
+                radial-gradient(ellipse at bottom right, rgba(179, 115, 77, 0.15) 0%, transparent 70%),
+                radial-gradient(ellipse at top left, rgba(200, 160, 100, 0.12) 0%, transparent 65%),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='72' viewBox='0 0 36 72'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%238a6d4d' fill-opacity='0.06'%3E%3Cpath d='M2 6h12L8 18 2 6zm18 36h12l-6 12-6-12z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"),
+                var(--cor-fundo-base);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Slide 10 - Efeito de lua com névoa */
+        .slide[data-slide-id="10"]::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(233, 223, 196, 0.12) 0%, rgba(233, 223, 196, 0.08) 30%, transparent 70%);
+            border-radius: 50%;
+            z-index: 0;
+            animation: lunarGlow 15s infinite alternate ease-in-out;
+        }
+
+        /* Slide 12: Características 3ª Geração - Tem um IMG no HTML, não precisa de background */
+        .slide[data-slide-id="12"] {
+             /* Estilos existentes ou adicionais se necessários, mas sem background-image */
+             background-color: var(--cor-fundo-base); /* Manter um fundo base */
+        }
+
+        /* Slide 13 - Gigantes da Tribuna */
+        .slide[data-slide-id="13"] {
+            background:
+                linear-gradient(45deg, rgba(179, 115, 77, 0.1) 0%, transparent 60%),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='88' height='24' viewBox='0 0 88 24'%3E%3Cg fill-rule='evenodd'%3E%3Cg fill='%23c8a064' fill-opacity='0.09'%3E%3Cpath d='M13 0v8H0V0h13zm22 0v8H22V0h13zM0 8h13v8H0V8zm22 0h13v8H22V8zm22 0h13v8H44V8zm22 0h13v8H66V8zm0-8h13v8H66V0zm22 8h13v8H88V8zm0-8h13v8H88V0zm0 16h13v8H88v-8zM66 16h13v8H66v-8zm-22 0h13v8H44v-8zm-22 0h13v8H22v-8zm-22 0h13v8H0v-8z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"),
+                var(--cor-fundo-base);
+            position: relative;
+        }
+
+        /* Slide 13 - Efeito de bandeira tremulando */
+        .slide[data-slide-id="13"]::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath fill='none' stroke='%23e8b471' stroke-width='0.75' d='M0,0 Q50,25 100,0 Q50,50 100,50 Q50,75 0,50 Q50,100 0,100' opacity='0.05'/%3E%3C/svg%3E");
+            background-size: 200px 200px;
+            z-index: 0;
+            animation: wavingFlag 25s infinite linear;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* Slide 15 - Final - Ajustes para garantir visibilidade */
+        .slide[data-slide-id="15"] {
+            background-image: url("https://i.imgur.com/5rx8P3z.png"); /* Nova imagem */
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-color: transparent; /* Garante que não haja cor sólida sobre a imagem */
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Reset inicial para elementos animados */
+        .slide:not(.active) .animated-element {
+            opacity: 0;
+        }
+        /* Classe base para elementos que terão animação de entrada */
+        .animated-element {
+            opacity: 0; /* Começa invisível */
+             will-change: transform, opacity; /* Dica de otimização */
+        }
+
+
+        /* --- Estilos de Conteúdo Interno --- */
+        .slide-content {
+             max-width: 1000px;
+             width: 100%;
+             display: flex;
+             flex-direction: column;
+             align-items: center;
+             gap: 25px;
+             position: relative;
+             z-index: 5;
+             /* Garante que o texto fique sobre a imagem de fundo com overlay */
+             color: var(--cor-texto-principal); /* Redefine a cor para garantir legibilidade sobre backgrounds */
+             text-shadow: 1px 1px 3px rgba(0,0,0,0.6); /* Sombra leve para melhorar contraste */
+        }
+
+        /* Aplicação correta da fonte cursiva */
+        .slide h1.title-display {
+            font-family: var(--fonte-display), cursive; /* Adiciona fallback genérico */
+            font-size: clamp(3.5em, 7vw, 6em);
+            color: var(--cor-titulo-principal);
+            margin-bottom: 10px;
+            line-height: 1.1;
+            font-weight: 400; /* Peso correto para Great Vibes */
+            transform-style: preserve-3d;
+            position: relative;
+        }
+
+        .slide h1.title-display.glow {
+             text-shadow: 0 0 12px var(--cor-glow), 0 0 20px var(--cor-glow), 0 0 30px rgba(0,0,0,0.5);
+        }
+
+        /* Efeito de profundidade para títulos */
+        .slide h1.title-display.depth-effect {
+            text-shadow:
+                1px 1px 1px rgba(233, 223, 196, 0.1),
+                2px 2px 1px rgba(233, 223, 196, 0.05),
+                3px 3px 2px rgba(0, 0, 0, 0.3),
+                4px 4px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .slide h1.title-display.illuminate {
+            animation: textIlluminate 4s infinite alternate ease-in-out;
+        }
+
+        .slide h2.subtitle {
+            font-family: var(--fonte-titulo-secao), serif; /* Fallback */
+            font-size: clamp(1.8em, 3.5vw, 2.8em);
+            color: var(--cor-titulo-secundario);
+            font-weight: 700;
+            font-style: italic;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        /* Decoração de subtítulo */
+        .slide h2.subtitle.decorated::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--cor-borda-destaque), transparent);
+        }
+
+         .slide h3.section-title {
+             font-family: var(--fonte-titulo-secao), serif; /* Fallback */
+             font-size: clamp(1.5em, 3vw, 2.2em);
+             color: var(--cor-titulo-principal);
+             font-weight: 700;
+             margin-bottom: 15px;
+             border-bottom: 2px solid var(--cor-borda-destaque);
+             padding-bottom: 8px;
+             display: inline-block;
+             position: relative;
+         }
+
+         /* Aprimoramento do título de seção */
+         .slide h3.section-title.enhanced {
+             border: none;
+             padding-bottom: 12px;
+         }
+
+         .slide h3.section-title.enhanced::after {
+             content: "";
+             position: absolute;
+             bottom: 0;
+             left: 0;
+             width: 100%;
+             height: 2px;
+             background: linear-gradient(90deg, transparent, var(--cor-borda-destaque) 20%, var(--cor-borda-destaque) 80%, transparent 100%);
+         }
+
+         .slide h3.section-title.enhanced::before {
+             content: "❦";
+             position: absolute;
+             bottom: -10px;
+             left: 50%;
+             transform: translateX(-50%);
+             font-size: 0.8em;
+             color: var(--cor-borda-destaque);
+             opacity: 0.8;
+         }
+
+
+        .slide p, .slide li {
+            font-size: clamp(1em, 1.8vw, 1.2em);
+            line-height: 1.75;
+            max-width: 750px;
+            text-align: left;
+            color: var(--cor-texto-principal); /* Garante que o texto use a cor principal */
+            position: relative;
+        }
+         .slide p.intro-text {
+             font-size: clamp(1.1em, 2vw, 1.4em);
+             font-style: italic;
+             color: var(--cor-texto-secundario); /* Pode precisar de ajuste se o fundo for escuro demais */
+             text-align: center;
+             max-width: 800px;
+             line-height: 1.8;
+         }
+        .slide p.centered {
+            text-align: center;
+        }
+
+        /* Destaque em parágrafos */
+        .slide p.highlight, .slide p.intro-text.highlight {
+            background: linear-gradient(90deg, transparent, rgba(232, 180, 113, 0.07) 20%, rgba(232, 180, 113, 0.07) 80%, transparent 100%);
+            padding: 15px 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            /* Adiciona um fundo semi-transparente para melhorar legibilidade sobre imagens complexas */
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .slide ul {
+            list-style: none;
+            padding-left: 0;
+            max-width: 750px;
+            width: 100%;
+            text-align: left;
+            margin-top: 15px;
+        }
+
+        .slide ul li {
+            margin-bottom: 14px;
+            position: relative;
+            padding-left: 35px;
+            transition: transform 0.3s ease;
+        }
+
+        /* Animação de hover para itens de lista */
+        .slide ul.interactive li:hover {
+            transform: translateX(5px);
+        }
+
+        .slide ul li::before {
+            content: '❖';
+            color: var(--cor-titulo-principal);
+            font-size: 1.3em;
+            position: absolute;
+            left: 0;
+            top: 3px;
+            opacity: 0.85;
+            transition: transform 0.3s ease, opacity 0.3s ease, color 0.3s ease;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5); /* Sombra para destaque */
+        }
+
+        /* Estilo alternativo para marcadores */
+        .slide ul.styled-markers li::before {
+            content: '✦';
+            font-size: 1.1em;
+        }
+
+        .slide ul.interactive li:hover::before {
+            transform: scale(1.2) rotate(15deg);
+            opacity: 1;
+            color: var(--cor-accent);
+        }
+
+        /* Estilo refinado para imagens de conteúdo */
+        .slide img.slide-image {
+            max-width: clamp(250px, 40vw, 450px);
+            height: auto;
+            border-radius: 12px; /* Aumenta levemente o arredondamento */
+            border: 6px solid var(--cor-borda-destaque); /* Borda mais presente */
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7); /* Sombra mais intensa */
+            margin-top: 20px;
+            object-fit: cover;
+            display: block; /* Evita espaço extra abaixo */
+            filter: brightness(0.98) saturate(0.95); /* Leve ajuste visual */
+            transition: transform 0.4s var(--animation-easing-element),
+                        box-shadow 0.4s var(--animation-easing-element),
+                        filter 0.4s ease; /* Transição suave para hover */
+        }
+        .slide img.slide-image:hover {
+            transform: scale(1.04); /* Aumenta um pouco mais no hover */
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.75); /* Sombra mais destacada */
+            filter: brightness(1) saturate(1); /* Remove o filtro no hover */
+        }
+
+        /* Moldura ornamental para imagens */
+        .slide img.framed {
+            position: relative;
+            padding: 10px;
+            background: linear-gradient(45deg, rgba(179, 115, 77, 0.2), rgba(200, 160, 100, 0.2));
+            border: 6px solid transparent;
+            border-image: linear-gradient(45deg, var(--cor-borda-destaque), var(--cor-accent)) 1;
+            box-shadow:
+                0 12px 35px rgba(0, 0, 0, 0.7),
+                0 0 0 1px rgba(232, 180, 113, 0.2);
+        }
+
+
+        .slide blockquote {
+            font-family: var(--fonte-titulo-secao), serif; /* Fallback */
+            font-size: clamp(1.3em, 2.2vw, 1.6em);
+            color: var(--cor-texto-principal);
+            margin-top: 30px;
+            padding: 25px 35px;
+            border-left: 6px solid var(--cor-titulo-principal);
+            background-color: rgba(0,0,0,0.55); /* Fundo mais opaco para legibilidade sobre imagens */
+            font-style: italic;
+            max-width: 700px;
+            position: relative;
+            border-radius: 0 8px 8px 0;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+        .slide blockquote::before {
+            content: '"';
+            font-family: var(--fonte-display), cursive; /* Fallback */
+            font-weight: 400; /* Garantir peso correto */
+            font-size: 3.5em;
+            color: var(--cor-borda-destaque);
+            position: absolute;
+            left: 15px;
+            top: -15px;
+            opacity: 0.25;
+            z-index: -1;
+        }
+
+        /* Efeito hover para citações */
+        .slide blockquote:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Estilo aprimorado para citações */
+        .slide blockquote.elegant {
+            background: linear-gradient(to right, rgba(0,0,0,0.6), rgba(0,0,0,0.45)); /* Mais opaco */
+            border-left: none;
+            border-radius: 8px;
+            padding: 30px 40px;
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(138, 109, 77, 0.2);
+        }
+
+        .slide blockquote.elegant::before {
+            content: '"';
+            font-size: 6em;
+            color: var(--cor-titulo-principal);
+            opacity: 0.15;
+            left: 20px;
+            top: -30px;
+        }
+
+        .slide blockquote.elegant::after {
+            content: '"';
+            font-family: var(--fonte-display), cursive;
+            font-weight: 400;
+            font-size: 6em;
+            color: var(--cor-titulo-principal);
+            position: absolute;
+            right: 20px;
+            bottom: -50px;
+            opacity: 0.15;
+            z-index: -1;
+        }
+
+         .slide blockquote footer {
+             font-family: var(--fonte-corpo), sans-serif; /* Fallback */
+             font-style: normal;
+             font-size: 0.8em;
+             text-align: right;
+             color: var(--cor-texto-secundario);
+             margin-top: 15px;
+             font-weight: 300;
+             padding-right: 10px;
+             position: relative;
+         }
+
+         /* Separador para o footer da citação */
+         .slide blockquote.elegant footer::before {
+             content: "";
+             position: absolute;
+             top: -8px;
+             right: 0;
+             width: 40%;
+             height: 1px;
+             background: linear-gradient(to left, var(--cor-borda-destaque), transparent);
+         }
+
+
+        /* Layouts Específicos */
+        .layout-split {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-around;
+            width: 100%;
+            gap: 6vw;
+            position: relative;
+             /* Adiciona um fundo sutil para agrupar visualmente em slides com imagem de fundo */
+            background-color: rgba(0, 0, 0, 0.15);
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .layout-split .text-content { flex-basis: 55%; text-align: left; }
+        .layout-split .image-content { flex-basis: 40%; text-align: center; }
+        .layout-split .image-content img { margin-top: 0; } /* Reset margin para imagens no split */
+
+        /* Conectores visuais para layout-split */
+        .layout-split.with-connector::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 2px;
+            height: 70%;
+            background: linear-gradient(to bottom, transparent, var(--cor-borda-destaque) 20%, var(--cor-borda-destaque) 80%, transparent);
+            opacity: 0.3;
+        }
+
+
+        /* --- Animações --- */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(35px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-35px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInLeft { from { opacity: 0; transform: translateX(-45px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes fadeInRight { from { opacity: 0; transform: translateX(45px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes zoomIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        @keyframes flipIn { from { opacity: 0; transform: rotateY(90deg); } to { opacity: 1; transform: rotateY(0); } }
+        @keyframes bounceIn {
+            0% { opacity: 0; transform: scale(0.3); }
+            50% { opacity: 1; transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes glowPulse {
+             0%, 100% { text-shadow: 0 0 10px var(--cor-glow), 0 0 15px rgba(0,0,0,0.3); }
+             50% { text-shadow: 0 0 18px var(--cor-glow), 0 0 28px var(--cor-glow), 0 0 40px rgba(0,0,0,0.5); }
+        }
+        @keyframes textIlluminate {
+            0%, 100% {
+                text-shadow:
+                    1px 1px 1px rgba(233, 223, 196, 0.1),
+                    2px 2px 1px rgba(233, 223, 196, 0.05),
+                    3px 3px 2px rgba(0, 0, 0, 0.3),
+                    4px 4px 2px rgba(0, 0, 0, 0.2);
+                color: var(--cor-titulo-principal);
+            }
+            50% {
+                text-shadow:
+                    0 0 5px rgba(232, 180, 113, 0.5),
+                    0 0 15px rgba(232, 180, 113, 0.3),
+                    0 0 25px rgba(232, 180, 113, 0.1);
+                color: #f0c78e;
+            }
+        }
+        @keyframes wavingFlag {
+            from { background-position: 0 0; }
+            to { background-position: 200px 200px; }
+        }
+        @keyframes lunarGlow {
+            0%, 100% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.1); }
+        }
+        @keyframes floatParticle { /* Animação de partículas, não mais usada no slide 15 */
+            0% { opacity: 0; transform: translate(0, 0) rotate(0deg); }
+            20% { opacity: 0.8; }
+            80% { opacity: 0.8; }
+            100% { opacity: 0; transform: translate(100px, -100px) rotate(360deg); }
+        }
+        @keyframes rotateIn {
+            from { opacity: 0; transform: rotate(-90deg); }
+            to { opacity: 1; transform: rotate(0); }
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        /* Classes de Animação */
+        .anim-fade-in { animation: fadeIn var(--animation-duration-element) var(--animation-easing-element) forwards; }
+        .anim-fade-in-up { animation: fadeInUp var(--animation-duration-element) var(--animation-easing-element) forwards; }
+        .anim-fade-in-down { animation: fadeInDown var(--animation-duration-element) var(--animation-easing-element) forwards; }
+        .anim-fade-in-left { animation: fadeInLeft var(--animation-duration-element) var(--animation-easing-element) forwards; }
+        .anim-fade-in-right { animation: fadeInRight var(--animation-duration-element) var(--animation-easing-element) forwards; }
+        .anim-zoom-in { animation: zoomIn var(--animation-duration-element) var(--animation-easing-element) forwards; }
+        .anim-flip-in { animation: flipIn var(--animation-duration-element) var(--animation-easing-element) forwards; }
+        .anim-bounce-in { animation: bounceIn var(--animation-duration-element) cubic-bezier(0.215, 0.610, 0.355, 1.000) forwards; }
+        .anim-slide-up-fade { animation: slideUpFade var(--animation-duration-element) var(--animation-easing-element) forwards; }
+        .anim-glow-pulse { animation: glowPulse 3s ease-in-out infinite; }
+        .anim-rotate-in { animation: rotateIn var(--animation-duration-element) var(--animation-easing-element) forwards; }
+
+        /* Efeito de shimmer */
+        .shimmer-text {
+            background: linear-gradient(90deg, var(--cor-texto-principal), var(--cor-titulo-secundario), var(--cor-texto-principal));
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: shimmer 4s linear infinite;
+            display: inline-block;
+        }
+
+        /* Delays */
+        .slide.active .anim-delay-1 { animation-delay: var(--animation-delay-step); }
+        .slide.active .anim-delay-2 { animation-delay: calc(var(--animation-delay-step) * 2); }
+        .slide.active .anim-delay-3 { animation-delay: calc(var(--animation-delay-step) * 3); }
+        .slide.active .anim-delay-4 { animation-delay: calc(var(--animation-delay-step) * 4); }
+        .slide.active .anim-delay-5 { animation-delay: calc(var(--animation-delay-step) * 5); }
+        .slide.active .anim-delay-6 { animation-delay: calc(var(--animation-delay-step) * 6); }
+        .slide.active .anim-delay-7 { animation-delay: calc(var(--animation-delay-step) * 7); }
+
+
+        /* --- Navegação --- */
+        .nav-button {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.45);
+            color: var(--cor-texto-secundario);
+            border: 1px solid var(--cor-borda-destaque);
+            padding: 15px;
+            font-size: 28px;
+            cursor: pointer;
+            z-index: 100;
+            border-radius: 50%;
+            transition: background-color 0.4s var(--animation-easing-element),
+                        color 0.4s var(--animation-easing-element),
+                        transform 0.4s var(--animation-easing-element),
+                        opacity 0.4s var(--animation-easing-element),
+                        box-shadow 0.4s var(--animation-easing-element);
+            width: 55px;
+            height: 55px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            line-height: 1;
+            opacity: 0.6;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+
+        .nav-button:hover {
+            background-color: rgba(0, 0, 0, 0.75);
+            color: var(--cor-texto-principal);
+            transform: translateY(-50%) scale(1.15);
+            opacity: 1;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        /* Destaque para botões de navegação */
+        .nav-button::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border-radius: 50%;
+            border: 1px solid var(--cor-borda-destaque);
+            opacity: 0;
+            transition: opacity 0.4s var(--animation-easing-element),
+                        transform 0.4s var(--animation-easing-element);
+            transform: scale(0.8);
+        }
+
+        .nav-button:hover::after {
+            opacity: 0.5;
+            transform: scale(1);
+        }
+
+        .prev { left: 30px; }
+        .next { right: 30px; }
+
+
+        /* --- Responsividade --- */
+        @media (max-width: 768px) {
+            .slide {
+                padding: 6vh 5vw;
+            }
+            .slide h1.title-display { font-size: clamp(2.8em, 10vw, 4.5em); }
+            .slide h2.subtitle { font-size: clamp(1.5em, 5vw, 2.2em); }
+            .slide h3.section-title { font-size: clamp(1.3em, 4.5vw, 1.8em); }
+            .slide p, .slide li { font-size: clamp(0.95em, 2.8vw, 1.1em); max-width: 95%; }
+            .slide blockquote { font-size: clamp(1.1em, 3.2vw, 1.4em); max-width: 95%; padding: 20px 25px;}
+            .slide img.slide-image { max-width: clamp(200px, 60vw, 320px); border-width: 4px;}
+
+            .layout-split {
+                flex-direction: column;
+                gap: 25px;
+                padding: 15px; /* Ajusta padding no mobile */
+            }
+            .layout-split .text-content { order: 2; flex-basis: auto; width: 100%; text-align: center; }
+            .layout-split .text-content ul,
+            .layout-split .text-content p { text-align: left; max-width: 100%; }
+            .layout-split .image-content { order: 1; flex-basis: auto; }
+
+            .layout-split.with-connector::after {
+                width: 70%;
+                height: 2px;
+                background: linear-gradient(to right, transparent, var(--cor-borda-destaque) 20%, var(--cor-borda-destaque) 80%, transparent);
+            }
+
+            .nav-button {
+                font-size: 20px;
+                width: 48px;
+                height: 48px;
+                padding: 12px;
+                opacity: 0.7;
+            }
+            .prev { left: 15px; }
+            .next { right: 15px; }
+            .slide ul li { padding-left: 30px; }
+            .slide blockquote::before { font-size: 3em; left: 10px; top: -10px; }
+
+            .slide blockquote.elegant::before {
+                font-size: 4em;
+                top: -20px;
+            }
+
+            .slide blockquote.elegant::after {
+                font-size: 4em;
+                bottom: -35px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="slideshow-container">
+
+        <!-- Slide 1: Capa (Conteúdo Removido, agora está na imagem de fundo) -->
+        <div class="slide" data-slide-id="1">
+            <div class="slide-content">
+                <!-- O conteúdo HTML foi removido, pois está na imagem de fundo -->
+            </div>
+        </div>
+
+        <!-- Slide 2: O Que Foi o Romantismo? - Aprimorado -->
+        <div class="slide" data-slide-id="2">
+             <div class="slide-content">
+                 <h3 class="section-title enhanced animated-element anim-fade-in">O Movimento Romântico</h3>
+                 <div class="layout-split with-connector">
+                    <div class="text-content animated-element anim-fade-in-left anim-delay-1">
+                        <p class="highlight animated-element anim-fade-in-up anim-delay-1">Surgido na Europa (fim do séc. XVIII), o Romantismo foi uma revolução artística, literária e filosófica.</p>
+                        <ul class="interactive">
+                            <li class="animated-element anim-fade-in-up anim-delay-2">Rejeitava o racionalismo e a rigidez do Neoclassicismo.</li>
+                            <li class="animated-element anim-fade-in-up anim-delay-3">Priorizava: <strong class="shimmer-text">Emoção</strong>, <strong class="shimmer-text">Subjetividade</strong>, <strong class="shimmer-text">Imaginação</strong> e <strong class="shimmer-text">Liberdade</strong> individual.</li>
+                            <li class="animated-element anim-fade-in-up anim-delay-4">Explorava o 'eu' interior, o sonho, o exótico, o histórico (Idade Média) e a natureza selvagem.</li>
+                        </ul>
+                    </div>
+                    <div class="image-content animated-element anim-zoom-in anim-delay-2">
+                        <img src="https://i.imgur.com/X4jG7FJ.png" alt="Contraste Neoclássico e Romântico" class="slide-image framed">
+                    </div>
+                 </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Contexto no Brasil - Aprimorado -->
+        <div class="slide" data-slide-id="3">
+            <div class="slide-content">
+                <h3 class="section-title enhanced animated-element anim-fade-in">Um Brasil em Busca de Si</h3>
+                 <p class="intro-text highlight animated-element anim-slide-up-fade anim-delay-1">O Romantismo chega ao Brasil em um período de grandes transformações:</p>
+                 <ul class="styled-markers interactive">
+                    <li class="animated-element anim-fade-in-left anim-delay-2"><strong class="shimmer-text">1808:</strong> Chegada da Corte Portuguesa - Abertura cultural e intelectual.</li>
+                    <li class="animated-element anim-fade-in-left anim-delay-3"><strong class="shimmer-text">1822:</strong> Independência - Urgência em construir uma identidade nacional distinta de Portugal.</li>
+                    <li class="animated-element anim-fade-in-left anim-delay-4"><strong class="shimmer-text">Projeto Nacionalista:</strong> A literatura e as artes são vistas como ferramentas para forjar símbolos e heróis genuinamente brasileiros.</li>
+                    <li class="animated-element anim-fade-in-left anim-delay-5">Busca por temas locais: a natureza exuberante, o passado indígena, os costumes populares.</li>
+                </ul>
+                <img src="https://i.imgur.com/GnmBOyu.png" alt="Contexto Histórico Brasileiro" class="slide-image framed animated-element anim-zoom-in anim-delay-3">
+            </div>
+        </div>
+
+        <!-- Slide 4: As Três Gerações - Aprimorado -->
+        <div class="slide" data-slide-id="4">
+             <div class="slide-content">
+                 <h3 class="section-title enhanced animated-element anim-rotate-in">As Fases do Romantismo Brasileiro</h3>
+                <p class="intro-text highlight animated-element anim-fade-in-up anim-delay-1">Para fins didáticos, dividimos o movimento em três "gerações", cada uma com focos e estilos predominantes:</p>
+                 <ul style="text-align: center; list-style: none; padding-left: 0;" class="interactive">
+                    <li class="animated-element anim-bounce-in anim-delay-2" style="font-size: 1.3em; margin-bottom: 25px;">
+                        <strong>Primeira Geração (c. 1836-1852):</strong>
+                        <span style="color: var(--cor-titulo-secundario); display: block; margin-top: 5px; position: relative;">
+                            Nacionalista e Indianista
+                            <svg xmlns="http://www.w3.org/2000/svg" width="150" height="10" viewBox="0 0 150 10" style="position: absolute; left: 50%; transform: translateX(-50%); bottom: -10px;">
+                                <path d="M0,1 C37.5,15 112.5,-15 150,1" stroke="var(--cor-borda-destaque)" stroke-width="1" fill="none" />
+                            </svg>
+                        </span>
+                    </li>
+                    <li class="animated-element anim-bounce-in anim-delay-3" style="font-size: 1.3em; margin-bottom: 25px;">
+                        <strong>Segunda Geração (c. 1853-1860s):</strong>
+                        <span style="color: var(--cor-titulo-secundario); display: block; margin-top: 5px; position: relative;">
+                            Ultrarromântica ("Mal do Século")
+                            <svg xmlns="http://www.w3.org/2000/svg" width="150" height="10" viewBox="0 0 150 10" style="position: absolute; left: 50%; transform: translateX(-50%); bottom: -10px;">
+                                <path d="M0,1 C37.5,15 112.5,-15 150,1" stroke="var(--cor-borda-destaque)" stroke-width="1" fill="none" />
+                            </svg>
+                        </span>
+                    </li>
+                    <li class="animated-element anim-bounce-in anim-delay-4" style="font-size: 1.3em;">
+                        <strong>Terceira Geração (c. 1870s):</strong>
+                        <span style="color: var(--cor-titulo-secundario); display: block; margin-top: 5px; position: relative;">
+                            Condoreira (Social)
+                            <svg xmlns="http://www.w3.org/2000/svg" width="150" height="10" viewBox="0 0 150 10" style="position: absolute; left: 50%; transform: translateX(-50%); bottom: -10px;">
+                                <path d="M0,1 C37.5,15 112.5,-15 150,1" stroke="var(--cor-borda-destaque)" stroke-width="1" fill="none" />
+                            </svg>
+                        </span>
+                    </li>
+                </ul>
+                 <p class="centered animated-element anim-fade-in anim-delay-5" style="margin-top: 30px; font-style:italic; font-size: 0.9em; position: relative; padding-top: 20px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="20" viewBox="0 0 80 20" style="position: absolute; left: 50%; transform: translateX(-50%); top: 0;">
+                        <path d="M0,10 C20,0 60,20 80,10" stroke="var(--cor-titulo-secundario)" stroke-width="1" fill="none" opacity="0.5" />
+                    </svg>
+                    Embora haja sobreposições e autores que transitem entre fases, essa divisão ajuda a compreender a evolução do movimento.
+                </p>
+            </div>
+        </div>
+
+        <!-- Slide 5: Título 1ª Geração -->
+        <div class="slide" data-slide-id="5">
+            <div class="slide-content">
+                <h1 class="title-display animated-element anim-fade-in">Primeira Geração</h1>
+                <h2 class="subtitle decorated animated-element anim-fade-in-up anim-delay-1">O Louvor da Pátria e do Índio</h2>
+                 <p class="intro-text animated-element anim-fade-in-up anim-delay-2">(Aproximadamente 1836 - 1852)</p>
+            </div>
+        </div>
+
+        <!-- Slide 6: Características 1ª Geração -->
+        <div class="slide" data-slide-id="6">
+             <div class="slide-content">
+                <h3 class="section-title animated-element anim-fade-in">Temas Fundadores</h3>
+                <div class="layout-split">
+                    <div class="text-content">
+                        <ul>
+                            <li class="animated-element anim-fade-in-up anim-delay-1"><strong>Nacionalismo Ufanista:</strong> Exaltação patriótica, orgulho da terra recém-independente.</li>
+                            <li class="animated-element anim-fade-in-up anim-delay-2"><strong>Indianismo:</strong> O indígena como símbolo da pureza e força originais do Brasil, o "bom selvagem" idealizado (muitas vezes sem rigor histórico).</li>
+                            <li class="animated-element anim-fade-in-up anim-delay-3"><strong>Natureza Exuberante:</strong> Descrição e louvor da paisagem tropical como diferencial brasileiro.</li>
+                            <li class="animated-element anim-fade-in-up anim-delay-4"><strong>Sentimentalismo e Religiosidade:</strong> Amor, saudade e fé presentes, mas de forma mais contida que na 2ª geração.</li>
+                            <li class="animated-element anim-fade-in-up anim-delay-5"><strong>Medievalismo:</strong> Influência europeia na busca por um passado heroico, adaptado ao contexto brasileiro com o índio no lugar do cavaleiro medieval.</li>
+                        </ul>
+                    </div>
+                    <div class="image-content animated-element anim-zoom-in anim-delay-2">
+                        <img src="https://i.imgur.com/e0ZEx0h.png" alt="Herói Indígena Idealizado" class="slide-image">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Autores 1ª Geração - Aprimorado -->
+        <div class="slide" data-slide-id="7">
+             <div class="slide-content">
+                <h3 class="section-title enhanced animated-element anim-fade-in">Vozes da Primeira Geração</h3>
+                 <ul class="styled-markers interactive">
+                    <li class="animated-element anim-fade-in-left anim-delay-1"><strong class="shimmer-text">Gonçalves Dias (1823-1864):</strong> Considerado o expoente máximo. Poesia lírica ("Canção do Exílio") e épica indianista ("I-Juca Pirama", "Os Timbiras").</li>
+                    <li class="animated-element anim-fade-in-left anim-delay-2"><strong class="shimmer-text">Gonçalves de Magalhães (1811-1882):</strong> Marco inicial com "Suspiros Poéticos e Saudades" (1836), embora a qualidade seja debatida.</li>
+                    <li class="animated-element anim-fade-in-left anim-delay-3"><strong class="shimmer-text">José de Alencar (1829-1877):</strong> Mestre da prosa romântica. Fase indianista inclui clássicos como "O Guarani", "Iracema" (prosa poética) e "Ubirajara".</li>
+                 </ul>
+                <blockquote class="elegant animated-element anim-zoom-in anim-delay-3">
+                    "Nosso céu tem mais estrelas,<br>
+                    Nossas várzeas têm mais flores,<br>
+                    Nossos bosques têm mais vida,<br>
+                    Nossa vida mais amores."
+                    <footer>- Gonçalves Dias, Canção do Exílio (fragmento)</footer>
+                </blockquote>
+
+                <!-- Decoração SVG estilizada -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="400" height="20" viewBox="0 0 400 20" style="position: absolute; bottom: 10%; left: 50%; transform: translateX(-50%); opacity: 0.2;">
+                    <path d="M0,10 C100,0 300,30 400,10" stroke="var(--cor-borda-destaque)" stroke-width="1" fill="none" />
+                    <path d="M0,15 C100,5 300,35 400,15" stroke="var(--cor-titulo-principal)" stroke-width="1" fill="none" />
+                </svg>
+            </div>
+        </div>
+
+        <!-- Slide 8: Título 2ª Geração -->
+        <div class="slide" data-slide-id="8">
+             <div class="slide-content">
+                <h1 class="title-display depth-effect animated-element anim-fade-in">Segunda Geração</h1>
+                <h2 class="subtitle decorated animated-element anim-fade-in-up anim-delay-1">Ultrarromantismo: A Dor de Existir</h2>
+                <p class="intro-text animated-element anim-fade-in-up anim-delay-2">(Aproximadamente 1853 - 1860s) - Também conhecida como "Mal do Século" ou Byroniana.</p>
+             </div>
+        </div>
+
+        <!-- Slide 9: Características 2ª Geração -->
+        <div class="slide" data-slide-id="9">
+            <div class="slide-content">
+                <h3 class="section-title animated-element anim-fade-in">Sombras da Alma</h3>
+                 <div class="layout-split">
+                     <div class="image-content animated-element anim-zoom-in anim-delay-1">
+                        <img src="https://i.imgur.com/HQ0CbTV.png" alt="Melancolia Ultrarromântica" class="slide-image">
+                    </div>
+                    <div class="text-content">
+                        <ul>
+                            <li class="animated-element anim-fade-in-up anim-delay-2"><strong>Egocentrismo e Subjetivismo Radical:</strong> O foco é absoluto no "eu" lírico, suas dores e angústias.</li>
+                            <li class="animated-element anim-fade-in-up anim-delay-3"><strong>Pessimismo e Tédio (Spleen):</strong> Sentimento profundo de inadequação, melancolia, falta de sentido na vida.</li>
+                            <li class="animated-element anim-fade-in-up anim-delay-4"><strong>Fuga da Realidade:</strong> Evasão através do sonho, da fantasia, do álcool, da loucura e, principalmente, da morte.</li>
+                            <li class="animated-element anim-fade-in-up anim-delay-5"><strong>Idealização Amorosa Extrema:</strong> A mulher é vista como anjo inatingível ou figura sensual e fatal, quase sempre levando à frustração.</li>
+                            <li class="animated-element anim-fade-in-up anim-delay-6"><strong>Atração pelo Mórbido:</strong> Fascínio pela noite, cemitérios, ruínas, doença e morte como libertação.</li>
+                             <li class="animated-element anim-fade-in-up anim-delay-7"><strong>Influência de Lord Byron:</strong> O poeta inglês e seu estilo de vida rebelde e atormentado foram modelos.</li>
+                        </ul>
+                    </div>
+                 </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Autores 2ª Geração - Aprimorado -->
+        <div class="slide" data-slide-id="10">
+            <div class="slide-content">
+                <h3 class="section-title enhanced animated-element anim-fade-in">Poetas da Noite</h3>
+                 <ul class="styled-markers interactive">
+                    <li class="animated-element anim-fade-in-left anim-delay-1"><strong class="shimmer-text">Álvares de Azevedo (1831-1852):</strong> Principal nome, morreu jovem. Obra dual: lirismo platônico ("Lira dos Vinte Anos") e ironia/sarcasmo macabro ("Noite na Taverna").</li>
+                    <li class="animated-element anim-fade-in-left anim-delay-2"><strong class="shimmer-text">Casimiro de Abreu (1839-1860):</strong> Tom mais suave, marcado pela saudade da infância e da pátria ("Meus Oito Anos", "Primaveras").</li>
+                    <li class="animated-element anim-fade-in-left anim-delay-3"><strong class="shimmer-text">Junqueira Freire (1832-1855):</strong> Poesia marcada pelo conflito entre a vida religiosa (foi monge beneditino) e as paixões mundanas ("Inspirações do Claustro").</li>
+                    <li class="animated-element anim-fade-in-left anim-delay-4"><strong class="shimmer-text">Fagundes Varela (1841-1875):</strong> Considerado de transição, abordou temas byronianos, mas também a natureza e questões sociais ("Cantos e Fantasias").</li>
+                 </ul>
+                <blockquote class="elegant animated-element anim-zoom-in anim-delay-3">
+                    "Oh! ter vinte anos sem gozar de leve<br>
+                    A ventura de uma alma de donzela!<br>
+                    E sem na vida ter sentido nunca<br>
+                    Na suave atração de um róseo corpo<br>
+                    Meus longos beijos langues de desejo!"
+                    <footer>- Álvares de Azevedo, Ideias Íntimas</footer>
+                </blockquote>
+
+                <!-- Elementos decorativos simbolizando a melancolia e a noite -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" style="position: absolute; top: 15%; left: 15%; opacity: 0.15;">
+                    <circle cx="15" cy="15" r="10" fill="var(--cor-texto-principal)" />
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" style="position: absolute; bottom: 25%; right: 15%; opacity: 0.1;">
+                    <circle cx="10" cy="10" r="7" fill="var(--cor-texto-principal)" />
+                </svg>
+            </div>
+        </div>
+
+        <!-- Slide 11: Título 3ª Geração -->
+        <div class="slide" data-slide-id="11">
+             <div class="slide-content">
+                 <h1 class="title-display illuminate animated-element anim-fade-in">Terceira Geração</h1>
+                 <h2 class="subtitle decorated animated-element anim-fade-in-up anim-delay-1">O Voo do Condor: Poesia Social</h2>
+                 <p class="intro-text animated-element anim-fade-in-up anim-delay-2">(Aproximadamente 1870s) - Também chamada Condoreira ou Hugoana.</p>
+             </div>
+        </div>
+
+        <!-- Slide 12: Características 3ª Geração -->
+        <div class="slide" data-slide-id="12">
+             <div class="slide-content">
+                 <h3 class="section-title animated-element anim-fade-in">Clamor por Justiça</h3>
+                <div class="layout-split">
+                    <div class="text-content">
+                        <ul>
+                            <li class="animated-element anim-fade-in-up anim-delay-1"><strong>Engajamento Social e Político:</strong> A poesia se volta para as grandes questões do país: Abolicionismo e Republicanismo.</li>
+                            <li class="animated-element anim-fade-in-up anim-delay-2"><strong>Tom Oratório e Grandiloquente:</strong> Linguagem eloquente, feita para ser declamada em público, com uso de exclamações, apóstrofes e hipérboles.</li>
+                            <li class="animated-element anim-fade-in-up anim-delay-3"><strong>Visão Ampla e Libertária:</strong> O "Condor", ave que voa alto, simboliza a busca por liberdade e a visão panorâmica dos problemas sociais.</li>
+                            <li class="animated-element anim-fade-in-up anim-delay-4"><strong>Lirismo Amoroso Renovado:</strong> O amor ainda é tema, mas a mulher é vista de forma mais concreta e sensual, menos etérea.</li>
+                            <li class="animated-element anim-fade-in-up anim-delay-5"><strong>Influência de Victor Hugo:</strong> O engajamento social e o estilo épico do escritor francês foram grande inspiração.</li>
+                        </ul>
+                    </div>
+                     <div class="image-content animated-element anim-zoom-in anim-delay-2">
+                        <img src="https://i.imgur.com/kz5vP1P.png" alt="Símbolo da Luta Social" class="slide-image">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Autores 3ª Geração - Aprimorado -->
+        <div class="slide" data-slide-id="13">
+            <div class="slide-content">
+                <h3 class="section-title enhanced animated-element anim-fade-in">Gigantes da Tribuna</h3>
+                <ul class="styled-markers interactive">
+                    <li class="animated-element anim-fade-in-left anim-delay-1"><strong class="shimmer-text">Castro Alves (1847-1871):</strong> O "Poeta dos Escravos". Principal nome da geração. Obras-primas como "O Navio Negreiro" e "Vozes d'África" (parte de "Espumas Flutuantes"). Mestre do lirismo amoroso também.</li>
+                     <li class="animated-element anim-fade-in-left anim-delay-2"><strong class="shimmer-text">Tobias Barreto (1839-1889):</strong> Importante filósofo e jurista, líder da "Escola do Recife". Sua poesia, embora condoreira, já aponta para novas ideias (influência alemã, crítica ao positivismo).</li>
+                    <li class="animated-element anim-fade-in-left anim-delay-3"><strong class="shimmer-text">Sousândrade (1833-1902):</strong> Poeta complexo e inovador para a época, com linguagem ousada e experimental ("O Guesa Errante"), pouco compreendido em seu tempo.</li>
+                 </ul>
+                <blockquote class="elegant animated-element anim-zoom-in anim-delay-3">
+                    "'Senhor Deus dos desgraçados! <br>
+                    Dizei-me vós, Senhor Deus! <br>
+                    Se é loucura... se é verdade <br>
+                    Tanto horror perante os céus?!'"
+                    <footer>- Castro Alves, O Navio Negreiro (fragmento)</footer>
+                </blockquote>
+
+                <!-- Elemento decorativo representando o condor em voo -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="200" height="80" viewBox="0 0 200 80" style="position: absolute; top: 10%; right: 10%; opacity: 0.15;">
+                    <path d="M10,40 C50,20 150,60 190,40" stroke="var(--cor-texto-principal)" stroke-width="2" fill="none" />
+                    <path d="M20,50 C60,30 140,70 180,50" stroke="var(--cor-texto-principal)" stroke-width="1" fill="none" />
+                </svg>
+            </div>
+        </div>
+
+        <!-- Slide 14: Legado -->
+         <div class="slide" data-slide-id="14">
+             <div class="slide-content">
+                 <h3 class="section-title animated-element anim-fade-in">Marcas na Cultura Brasileira</h3>
+                <p class="intro-text animated-element anim-fade-in-up anim-delay-1">O Romantismo deixou um legado profundo e duradouro:</p>
+                 <ul class="animated-element" style="text-align: center; list-style-position: inside;">
+                    <li class="animated-element anim-fade-in-left anim-delay-2">Estabeleceu as bases de uma <strong>literatura nacional autônoma</strong>.</li>
+                    <li class="animated-element anim-fade-in-left anim-delay-3">Consolidou o <strong>romance</strong> e a <strong>poesia</strong> como formas de expressão da identidade brasileira.</li>
+                    <li class="animated-element anim-fade-in-left anim-delay-4">Explorou temas essenciais: a <strong>natureza</strong>, o <strong>índio</strong>, a <strong>crítica social</strong>, o <strong>amor</strong>, a <strong>morte</strong>.</li>
+                    <li class="animated-element anim-fade-in-left anim-delay-5">Abriu caminho para os movimentos seguintes (Realismo/Naturalismo, Parnasianismo, Simbolismo), que dialogaram com (e muitas vezes negaram) seus ideais.</li>
+                 </ul>
+                 <p class="centered animated-element anim-fade-in anim-delay-6" style="margin-top: 25px; font-weight: bold; color: var(--cor-titulo-principal);">Um capítulo essencial na formação da nossa identidade cultural.</p>
+             </div>
+        </div>
+
+        <!-- Slide 15: Final (Conteúdo Removido, agora está na imagem de fundo) -->
+        <div class="slide" data-slide-id="15">
+             <div class="slide-content">
+                 <!-- O conteúdo HTML foi removido, pois está na imagem de fundo -->
+             </div>
+        </div>
+
+        <!-- Navigation -->
+        <button class="nav-button prev" onclick="changeSlide(-1)" aria-label="Slide Anterior">❮</button>
+        <button class="nav-button next" onclick="changeSlide(1)" aria-label="Próximo Slide">❯</button>
+
+    </div>
+
+    <script>
+        let currentSlideIndex = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        let isTransitioning = false; // Flag para evitar cliques rápidos durante a transição
+
+        // Função para aplicar animações de entrada aos elementos do slide ativo
+        function applyAnimations(slideElement) {
+            const slideContent = slideElement.querySelector('.slide-content');
+            // Check if slideContent exists and has children before proceeding
+            if (!slideContent || !slideContent.children.length) {
+                // console.log(`Slide ${slideElement.dataset.slideId} has no content to animate.`);
+                return; // No content to animate (e.g., slides 1 and 15)
+            }
+
+            const animatedElements = slideElement.querySelectorAll('.animated-element');
+
+            animatedElements.forEach(el => {
+                // Remove previous animation classes to reset state
+                 const classesToRemove = Array.from(el.classList).filter(
+                     className => className.startsWith('anim-') && className !== 'animated-element'
+                 );
+                 el.classList.remove(...classesToRemove);
+
+                 // Reset inline styles potentially set by animations
+                 el.style.opacity = '0'; // Start hidden before animation
+                 el.style.transform = '';
+            });
+
+             // FORÇAR REFLOW/REPAINT - Crucial before reapplying classes
+             void slideElement.offsetWidth;
+
+             // Reapply animation classes
+             animatedElements.forEach(el => {
+                let baseAnimClass = '';
+                let delayClass = '';
+
+                // Find specific animation and delay classes defined in HTML
+                el.classList.forEach(className => {
+                    if (className.startsWith('anim-') && !className.startsWith('anim-delay-') && className !== 'animated-element') {
+                        baseAnimClass = className;
+                    } else if (className.startsWith('anim-delay-')) {
+                        delayClass = className;
+                    }
+                });
+
+                // Determine a default animation if none specified (optional but good fallback)
+                if (!baseAnimClass) {
+                    if (el.tagName === 'H1' || el.tagName === 'H3' || el.classList.contains('title-display') || el.classList.contains('section-title')) baseAnimClass = 'anim-fade-in';
+                    else if (el.tagName === 'IMG' || el.tagName === 'BLOCKQUOTE' || el.classList.contains('image-content')) baseAnimClass = 'anim-zoom-in';
+                    else if (el.tagName === 'LI') baseAnimClass = 'anim-fade-in-left';
+                    else baseAnimClass = 'anim-fade-in-up'; // General default
+                }
+
+                // Re-add the determined classes
+                if(baseAnimClass) el.classList.add(baseAnimClass);
+                if(delayClass) el.classList.add(delayClass);
+                // Opacity will be handled by the animation class starting from the reset '0'
+             });
+        }
+
+        function showSlide(index) {
+            // Early exit if already transitioning or target is current slide
+            const currentActiveSlide = document.querySelector('.slide.active');
+            const targetIndex = (index + totalSlides) % totalSlides; // Ensure index wraps correctly
+
+            // Check if the target is the same as the current active slide
+            if (currentActiveSlide && Array.from(slides).indexOf(currentActiveSlide) === targetIndex) {
+                 // console.log("Target slide is already active.");
+                 return;
+            }
+             // Prevent starting a new transition if one is already in progress
+             if (isTransitioning) {
+                 // console.log("Transition already in progress.");
+                 return;
+             }
+
+            isTransitioning = true;
+            const nextSlide = slides[targetIndex];
+             if (!nextSlide) {
+                 console.error(`Slide element not found for index: ${targetIndex}`);
+                 isTransitioning = false;
+                 return;
+             }
+
+            // console.log(`Transitioning to slide ${targetIndex + 1}`); // Log target slide
+
+            let entranceDirection = 1; // Default: entering from right
+            let currentIdx = -1;
+            if (currentActiveSlide) {
+                currentIdx = Array.from(slides).indexOf(currentActiveSlide);
+                // Determine direction based on index change, handling wrap-around
+                if (targetIndex === (currentIdx - 1 + totalSlides) % totalSlides) { // Moving Backwards
+                    entranceDirection = -1;
+                }
+                // entranceDirection remains 1 for forward movement & wrap around forwards
+            } else {
+                entranceDirection = 0; // First load
+            }
+
+            const transitionDuration = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--transition-speed-slide') || '1.1') * 1000;
+            const cleanupDelayBuffer = 50; // Small buffer for timeouts
+
+            // --- Handle Current (Exiting) Slide ---
+            if (currentActiveSlide) {
+                // Set exit transform based on where the NEW slide is coming from
+                if (entranceDirection > 0 || entranceDirection === 0) { // New slide from right or initial load -> current exits left
+                    currentActiveSlide.style.transformOrigin = 'left center';
+                    currentActiveSlide.style.transform = 'translateX(-100%) rotateY(8deg)';
+                } else { // New slide from left -> current exits right
+                    currentActiveSlide.style.transformOrigin = 'right center';
+                    currentActiveSlide.style.transform = 'translateX(100%) rotateY(-8deg)';
+                }
+                currentActiveSlide.classList.add('exiting');
+                currentActiveSlide.classList.remove('active');
+
+                // Cleanup exiting state after transition using timeout for reliability
+                const slideToCleanExit = currentActiveSlide; // Capture reference
+                setTimeout(() => {
+                    // Check if element still exists and has the class (robustness)
+                    if (slideToCleanExit && slideToCleanExit.classList.contains('exiting')) {
+                         slideToCleanExit.classList.remove('exiting');
+                         // Reset transforms applied for exit animation *after* transition ends
+                         slideToCleanExit.style.transform = '';
+                         slideToCleanExit.style.transformOrigin = '';
+                         // Opacity/Visibility are handled by base .slide CSS + transition delay
+                    }
+                }, transitionDuration);
+            }
+
+            // --- Prepare Next (Entering) Slide ---
+            nextSlide.classList.remove('exiting'); // Ensure no leftover exiting state
+            // Reset potential lingering inline styles
+            nextSlide.style.transform = '';
+            nextSlide.style.opacity = '';
+            nextSlide.style.transformOrigin = '';
+            // Ensure it starts visually hidden (CSS should handle default, but explicit is safer)
+            nextSlide.style.visibility = 'hidden';
+
+            // Set initial transform/opacity based on entrance direction (BEFORE reflow)
+            if (entranceDirection > 0) { // Enters from Right
+                nextSlide.style.transform = 'translateX(100%) rotateY(-8deg)';
+                nextSlide.style.transformOrigin = 'right center';
+            } else if (entranceDirection < 0) { // Enters from Left
+                nextSlide.style.transform = 'translateX(-100%) rotateY(8deg)';
+                nextSlide.style.transformOrigin = 'left center';
+            } else { // First load (Gentle Fade/Zoom)
+                nextSlide.style.transform = 'scale(0.95)';
+                nextSlide.style.opacity = '0'; // Start fully transparent for fade-in
+                nextSlide.style.transformOrigin = 'center center';
+            }
+
+            // Force browser reflow to apply start state before transition
+            void nextSlide.offsetWidth;
+
+            // --- Start Transition In ---
+            nextSlide.classList.add('active'); // Add class to trigger CSS transition rules
+            // Explicitly set final state inline - CSS transition will animate towards these
+            // Redundant with .active CSS but ensures immediate application before potential JS yielding
+            nextSlide.style.visibility = 'visible';
+            nextSlide.style.transform = 'translateX(0) rotateY(0deg) scale(1)'; // Target transform
+            nextSlide.style.opacity = '1'; // Target opacity
+
+            // Apply animations to internal elements of the new slide
+            applyAnimations(nextSlide);
+
+            currentSlideIndex = targetIndex;
+
+            // --- Post-Transition Cleanup for ACTIVE slide ---
+            // Use a separate timeout for the active slide cleanup
+            const slideToCleanActive = nextSlide; // Capture reference
+            setTimeout(() => {
+                // Only remove inline styles if this slide is STILL the active one
+                // (prevents issues if user navigates away quickly before cleanup)
+                if (slideToCleanActive.classList.contains('active')) {
+                    // Let the .active CSS class fully control the final state
+                    slideToCleanActive.style.transform = '';
+                    slideToCleanActive.style.opacity = '';
+                    slideToCleanActive.style.visibility = ''; // Let CSS handle this
+                    slideToCleanActive.style.transformOrigin = '';
+                }
+            }, transitionDuration);
+
+            // Reset isTransitioning flag slightly after the transition duration
+            // to allow cleanup timeouts to potentially start
+             setTimeout(() => {
+                 isTransitioning = false;
+                 // console.log("Transition finished.");
+             }, transitionDuration + cleanupDelayBuffer);
+
+        }
+
+
+        function changeSlide(direction) {
+            showSlide(currentSlideIndex + direction);
+        }
+
+        // Navegação por teclado
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                changeSlide(1);
+            } else if (e.key === 'ArrowLeft') {
+                changeSlide(-1);
+            }
+        });
+
+        // Carregamento Inicial
+        document.addEventListener('DOMContentLoaded', () => {
+             // Short delay to ensure styles are fully loaded and DOM is ready
+             setTimeout(() => {
+                  showSlide(0);
+             }, 100);
+        });
+
+    </script>
+
+</body>
+</html>
